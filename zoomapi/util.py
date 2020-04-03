@@ -13,6 +13,7 @@ import socketserver
 from threading import Thread
 from urllib.parse import urlparse, urlencode, quote
 import webbrowser
+import subprocess
 import os
 
 class ApiClient(object):
@@ -128,6 +129,8 @@ class ApiClient(object):
             data = json.dumps(data)
         if headers is None:
             headers = {"Authorization": "Bearer {}".format(self.config.get("token"))}
+        headers["Content-type"] = "application/json"
+
         return requests.patch(
             self.url_for(endpoint),
             params=params,
@@ -283,16 +286,19 @@ def get_oauth_token(cid, client_secret, redirect_url, browser_path):
         'https://zoom.us/oauth/authorize')
 
     print ('Going to %s to authorize access.' % authorization_url)
-    #chrome_path= r'/mnt/c/Program\ Files\ \(x86\)/Google/Chrome/Application/chrome.exe' 
-    authorization_url = authorization_url.replace('&', '\&')
-    print(authorization_url)
-    os.system(browser_path + " " + authorization_url)
-
+    # chrome_path= r'/mnt/c/Program\ Files\ \(x86\)/Google/Chrome/Application/chrome.exe' 
+    # authorization_url = authorization_url.replace('&', '\&')
+    # CHROME = os.path.join('C:\\', 'Program Files (x86)', 'Google', 'Chrome', 'Application', 'chrome.exe')
+    # subprocess.call([CHROME,authorization_url])
+    # os.system(browser_path + " "+ authorization_url)
+    # os.system('"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"'+" "+authorization_url)
+    webbrowser.open(authorization_url)
     http_receiver()
 
     token = oauth.fetch_token(
         'https://zoom.us/oauth/token',
         code=TokenHandler.code,
         client_secret=client_secret)
+    print(token)
     resp = dict(token)
     return resp["access_token"]
