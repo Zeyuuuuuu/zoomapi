@@ -52,6 +52,10 @@ while not stop:
         print("join -- join a channel by id")
         print("leave -- leave a channel by id")
         print("remove -- remove a channel by id")
+        print("send-message -- send a message to an individual or a channel")
+        print("list-message -- list previous messages with an individual or within a channel")
+        print("update-message -- edit a chat message sent previously")
+        print("delete-message -- delete a message sent previously")       
     elif message == "list":
         print(json.loads(client.chat_channels.list().content))
     elif message == "create":
@@ -102,5 +106,49 @@ while not stop:
         channel_id = input("Enter channel id: ")
         member_id = input("Enter member id: ")
         print(client.chat_channels.remove(channelId=channel_id,memberId=member_id))
+    elif message == "send-message":
+        text = input("Enter your message:")
+        receiver = input("To a contact or a channel? (Enter CONTACT or CHANNEL)")
+        if receiver == "CONTACT":
+            member_email_address = input("Enter the contact's email address:")
+            print(client.chat_messages.post(to_contact=member_email_address, message=text))
+        elif receiver == "CHANNEL":
+            channel_id = input("Enter channel id:")
+            print(client.chat_messages.post(to_channel=channel_id, message=text))
+        else:
+            print("Wrong input.")
+    elif message == "update-message":
+        messageId = input("Enter message id:")
+        text = input("Enter new message:")
+        receiver = input("To a contact or a channel? (Enter CONTACT or CHANNEL)")
+        if receiver == "CONTACT":
+            member_email_address = input("Enter the contact's email address:")
+            print(client.chat_messages.update(to_contact=member_email_address, message=text, messageId=messageId))
+        elif receiver == "CHANNEL":
+            channel_id = input("Enter channel id:")
+            print(client.chat_messages.update(to_channel=channel_id, message=text, messageId=messageId))
+        else:
+            print("Wrong input.")
+    elif message == "delete-message":
+        messageId = input("Enter message id:")
+        receiver = input("To a contact or a channel? (Enter CONTACT or CHANNEL)")
+        if receiver == "CONTACT":
+            member_email_address = input("Enter the contact's email address:")
+            print(client.chat_messages.delete(to_contact=member_email_address, messageId=messageId))
+        elif receiver == "CHANNEL":
+            channel_id = input("Enter channel id:")
+            print(client.chat_messages.delete(to_channel=channel_id, messageId=messageId))
+        else:
+            print("Wrong input.")
+    elif message == "list-message":
+        receiver = input("With a contact or within a channel? (Enter CONTACT or CHANNEL)")
+        if receiver == "CONTACT":
+            member_email_address = input("Enter the contact's email address:")
+            print(json.loads(client.chat_messages.list(to_contact=member_email_address, user_id="me").content))
+        elif receiver == "CHANNEL":
+            channel_id = input("Enter channel id:")
+            print(json.loads(client.chat_messages.list(to_channel=channel_id, user_id="me").content))
+        else:
+            print("Wrong input.")
     else:
-        print(client.chat_messages.post(to_channel=cid, message=message))
+        print("Wrong input.")
